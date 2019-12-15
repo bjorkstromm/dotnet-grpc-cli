@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ToolCommandName>dotnet-grpc_cli</ToolCommandName>
+    <PackAsTool>True</PackAsTool>
+    <OutputType>Exe</OutputType>
+    <Version>0.1.0-alpha01</Version>
+    <PackageId>dotnet-grpc-cli</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Cli" Version="0.29.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.25.0" />
+    <PackageReference Include="Grpc.Reflection" Version="2.25.0" />
+  </ItemGroup>
+
+</Project>
