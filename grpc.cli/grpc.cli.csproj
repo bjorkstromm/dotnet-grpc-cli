@@ -6,7 +6,7 @@
     <ToolCommandName>dotnet-grpc_cli</ToolCommandName>
     <PackAsTool>True</PackAsTool>
     <OutputType>Exe</OutputType>
-    <Version>0.1.0-alpha01</Version>
+    <Version>0.1.0-alpha02</Version>
     <PackageId>dotnet-grpc-cli</PackageId>
   </PropertyGroup>
 

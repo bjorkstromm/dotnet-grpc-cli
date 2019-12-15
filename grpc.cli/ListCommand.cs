@@ -69,7 +69,9 @@ namespace grpc.client
                     Console.WriteLine(GetMethod(method));
                 }
 
-                static string GetMethod(MethodDescriptor method) => $"rpc {method.Name}({method.InputType.FullName}) returns ({method.OutputType.FullName}) {{}}";
+                static string GetMethod(MethodDescriptor method) =>
+                    $"rpc {method.Name}({(method.IsClientStreaming ? "stream " : string.Empty)}{method.InputType.FullName})" +
+                    $" returns ({(method.IsServerStreaming ? "stream " : string.Empty)}{method.OutputType.FullName}) {{}}";
             }
 
             return 0;
