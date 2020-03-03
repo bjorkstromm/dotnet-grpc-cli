@@ -2,7 +2,7 @@
   "profiles": {
     "grpc.cli": {
       "commandName": "Project",
-      "commandLineArgs": "ls localhost:5001 Greet.Greeter"
+      "commandLineArgs": "ls localhost:5001 Shared_CS.Calculator"
     }
   }
 }

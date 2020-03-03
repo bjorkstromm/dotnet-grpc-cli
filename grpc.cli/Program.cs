@@ -12,6 +12,7 @@ namespace grpc.client
             app.Configure(config =>
             {
                 config.AddCommand<ListCommand>("ls");
+                config.AddCommand<DumpCommand>("dump");
             });
 
             return app.RunAsync(args);
