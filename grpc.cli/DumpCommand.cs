@@ -47,8 +47,8 @@ namespace grpc.client
         private async Task WriteFileDescriptor(FileDescriptor descriptor, StringWriter writer)
         {
             // Syntax
-            await writer.WriteLineAsync("syntax = \"proto3\"");
-            await writer.WriteLineAsync($"package = {descriptor.Package}");
+            await writer.WriteLineAsync("syntax = \"proto3\";");
+            await writer.WriteLineAsync($"package = {descriptor.Package};");
 
             // Dependencies
 
