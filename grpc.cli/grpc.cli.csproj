@@ -8,12 +8,19 @@
     <OutputType>Exe</OutputType>
     <Version>0.1.0</Version>
     <PackageId>dotnet-grpc-cli</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/mholo65/dotnet-grpc-cli/</RepositoryUrl>
+    <Title>gRPC CLI</Title>
+    <Authors>Martin Björkström</Authors>
+    <Description>gRPC CLI as .NET Global Tool</Description>
+    <Copyright>Copyright (c) 2019 Martin Björkström</Copyright>
+    <PackageTags>gRPC;protobuf;proto;proto3;reflection</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Spectre.Cli" Version="0.29.0" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.25.0" />
-    <PackageReference Include="Grpc.Reflection" Version="2.25.0" />
+    <PackageReference Include="Spectre.Cli" Version="0.36.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.29.0" />
+    <PackageReference Include="Grpc.Reflection" Version="2.30.0" />
   </ItemGroup>
 
 </Project>
