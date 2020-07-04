@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
-    <ToolCommandName>dotnet-grpc_cli</ToolCommandName>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ToolCommandName>dotnet-grpc-cli</ToolCommandName>
     <PackAsTool>True</PackAsTool>
     <OutputType>Exe</OutputType>
-    <Version>0.1.0-alpha02</Version>
+    <Version>0.1.0</Version>
     <PackageId>dotnet-grpc-cli</PackageId>
   </PropertyGroup>
 

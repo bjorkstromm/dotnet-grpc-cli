@@ -14,10 +14,16 @@ namespace grpc.client
         {
             var address = settings.Address;
 
-            if (!address.StartsWith("http://") ||
+            if (!address.StartsWith("http://") &&
                 !address.StartsWith("https://"))
             {
                 address = $"https://{address}";
+            }
+
+            if (address.StartsWith("http://"))
+            {
+                // This switch must be set before creating the GrpcChannel/HttpClient.
+                AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             }
 
             var server = address;
