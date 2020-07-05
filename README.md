@@ -38,30 +38,44 @@ service TimeService {
 Example:
 ```
 dotnet grpc-cli dump http://localhost:10042 MegaCorp.TimeService
+---
+File: ProtoBuf.Grpc.Internal.Empty.proto
+---
 syntax = "proto3";
-package = ProtoBuf.Grpc.Internal;
+package ProtoBuf.Grpc.Internal;
+
 message Empty {
 }
 
-
+---
+File: MegaCorp.TimeResult.proto
+---
 syntax = "proto3";
-package = google.protobuf;
-message Timestamp {
-  int64 seconds = 1;
-  int32 nanos = 2;
-}
+import "google/protobuf/timestamp.proto";
+package MegaCorp;
 
-
-syntax = "proto3";
-package = MegaCorp;
 message TimeResult {
   Timestamp Time = 1;
 }
 
-
+---
+File: MegaCorp.TimeService.proto
+---
 syntax = "proto3";
-package = MegaCorp;
+import "ProtoBuf.Grpc.Internal.Empty.proto";
+import "MegaCorp.TimeResult.proto";
+package MegaCorp;
+
 service TimeService {
    rpc Subscribe(Empty) returns (stream TimeResult);
 }
+```
+
+# Write proto to disk
+
+`dotnet grpc-cli dump <address> <service> -o <directory>`
+
+Example:
+```
+dotnet grpc-cli dump http://localhost:10042 MegaCorp.TimeService -o ./protos
 ```
