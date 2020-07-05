@@ -13,5 +13,8 @@ namespace grpc.client
 
         [CommandArgument(1, "<SERVICE>")]
         public string Service { get; set; }
+
+        [CommandOption( "-o|--output <OUTPUT>")]
+        public string Output { get; set; }
     }
 }

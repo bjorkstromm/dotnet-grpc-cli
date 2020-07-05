@@ -37,26 +37,72 @@ namespace grpc.client
             var descriptors = FileDescriptor.BuildFromByteStrings(stream.ResponseStream.Current.FileDescriptorResponse.FileDescriptorProto);
             await stream.RequestStream.CompleteAsync();
 
+            // Output
+            if (!string.IsNullOrWhiteSpace(settings.Output))
+            {
+                settings.Output = Path.GetFullPath(settings.Output);
+
+                if (!Directory.Exists(settings.Output))
+                {
+                    Directory.CreateDirectory(settings.Output);
+                }
+            }
+
             foreach (var descriptor in descriptors)
             {
-                using var writer = new StringWriter();
+                if (IsWellKnownType(descriptor))
+                {
+                    continue;
+                }
+
+                TextWriter writer;
+
+                if (string.IsNullOrWhiteSpace(settings.Output))
+                {
+                    writer = Console.Out;
+                    await writer.WriteLineAsync("---");
+                    await writer.WriteAsync("File: ");
+                    await writer.WriteLineAsync(descriptor.Name);
+                    await writer.WriteLineAsync("---");
+                }
+                else
+                {
+                    var path = Path.Join(settings.Output, descriptor.Name);
+                    writer = File.CreateText(path);
+                }
+
                 await WriteFileDescriptor(descriptor, writer);
-                Console.WriteLine(writer.ToString());
+                await writer.DisposeAsync();
             }
 
             return 0;
         }
 
+        private static bool IsWellKnownType(FileDescriptor descriptor)
+        {
+            return descriptor.Name.StartsWith("google/protobuf/")
+                   && descriptor.Package.Equals("google.protobuf");
+        }
+
         private const string NoIndent = "";
         private const string Indent = "  ";
 
-        private async Task WriteFileDescriptor(FileDescriptor descriptor, StringWriter writer)
+        private async Task WriteFileDescriptor(FileDescriptor descriptor, TextWriter writer)
         {
             // Syntax
             await writer.WriteLineAsync("syntax = \"proto3\";");
-            await writer.WriteLineAsync($"package = {descriptor.Package};");
 
             // Dependencies
+            foreach (var dependency in descriptor.Dependencies)
+            {
+                await writer.WriteLineAsync($"import \"{dependency.Name}\";");
+            }
+
+            // Package
+            await writer.WriteLineAsync($"package {descriptor.Package};");
+
+            // Empty line
+            await writer.WriteLineAsync();
 
             // Messages
             foreach (var message in descriptor.MessageTypes)
@@ -73,7 +119,7 @@ namespace grpc.client
             }
         }
 
-        private async Task WriteServiceDescriptor(ServiceDescriptor service, StringWriter writer, string indentation = NoIndent)
+        private async Task WriteServiceDescriptor(ServiceDescriptor service, TextWriter writer, string indentation = NoIndent)
         {
             await writer.WriteLineAsync($"service {service.Name} {{");
             foreach (var method in service.Methods)
@@ -83,7 +129,7 @@ namespace grpc.client
             await writer.WriteLineAsync($"{indentation}}}");
         }
 
-        private async Task WriteMethodDescription(MethodDescriptor method, StringWriter writer, string indentation = NoIndent)
+        private async Task WriteMethodDescription(MethodDescriptor method, TextWriter writer, string indentation = NoIndent)
         {
             await writer.WriteAsync($"{indentation} rpc {method.Name}(");
 
@@ -99,7 +145,7 @@ namespace grpc.client
             await writer.WriteLineAsync($"{method.OutputType.Name});");
         }
 
-        private async Task WriteMessageDescriptor(MessageDescriptor message, StringWriter writer, string indentation = NoIndent)
+        private async Task WriteMessageDescriptor(MessageDescriptor message, TextWriter writer, string indentation = NoIndent)
         {
             await writer.WriteAsync(indentation);
             await writer.WriteLineAsync($"message {message.Name} {{");
@@ -122,7 +168,7 @@ namespace grpc.client
             await writer.WriteLineAsync($"{indentation}}}");
         }
 
-        private async Task WriteOneOfDescriptor(OneofDescriptor oneof, StringWriter writer, string indentation = NoIndent)
+        private async Task WriteOneOfDescriptor(OneofDescriptor oneof, TextWriter writer, string indentation = NoIndent)
         {
             await writer.WriteLineAsync($"{indentation}oneof {oneof.Name} {{");
             foreach (var field in oneof.Fields)
@@ -132,7 +178,7 @@ namespace grpc.client
             await writer.WriteLineAsync($"{indentation}}}");
         }
 
-        private async Task WriteFieldDescriptor(FieldDescriptor field, StringWriter writer, string indentation = NoIndent)
+        private async Task WriteFieldDescriptor(FieldDescriptor field, TextWriter writer, string indentation = NoIndent)
         {
             await writer.WriteAsync(indentation);
 
