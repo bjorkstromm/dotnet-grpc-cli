@@ -2,7 +2,7 @@
   "profiles": {
     "grpc.cli": {
       "commandName": "Project",
-      "commandLineArgs": "dump http://localhost:10042 grpc.reflection.v1alpha.ServerReflection"
+      "commandLineArgs": "dump https://localhost:5003 ConfTool.Shared.Contracts.ConferencesService -o protos"
     }
   }
 }

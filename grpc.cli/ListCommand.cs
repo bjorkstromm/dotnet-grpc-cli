@@ -27,9 +27,9 @@ namespace grpc.client
             }
 
             var server = address;
-            var channel = Grpc.Net.Client.GrpcChannel.ForAddress(server);
+            using var channel = Grpc.Net.Client.GrpcChannel.ForAddress(server);
             var client = new ServerReflection.ServerReflectionClient(channel);
-            var stream = client.ServerReflectionInfo();
+            using var stream = client.ServerReflectionInfo();
 
             if (string.IsNullOrEmpty(settings.Service))
             {

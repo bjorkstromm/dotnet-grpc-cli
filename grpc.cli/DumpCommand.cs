@@ -68,6 +68,13 @@ namespace grpc.client
                 else
                 {
                     var path = Path.Join(settings.Output, descriptor.Name);
+                    
+                    var directory = Path.GetDirectoryName(path);
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+
                     writer = File.CreateText(path);
                 }
 
@@ -104,6 +111,13 @@ namespace grpc.client
             // Empty line
             await writer.WriteLineAsync();
 
+            // Enums
+            foreach (var @enum in descriptor.EnumTypes)
+            {
+                await WriteEnumDescriptor(@enum, writer);
+                await writer.WriteLineAsync();
+            }
+
             // Messages
             foreach (var message in descriptor.MessageTypes)
             {
@@ -137,18 +151,36 @@ namespace grpc.client
             {
                 await writer.WriteAsync("stream ");
             }
-            await writer.WriteAsync($"{method.InputType.Name}) returns (");
+            await writer.WriteAsync($"{method.InputType.FullName}) returns (");
             if (method.IsServerStreaming)
             {
                 await writer.WriteAsync("stream ");
             }
-            await writer.WriteLineAsync($"{method.OutputType.Name});");
+            await writer.WriteLineAsync($"{method.OutputType.FullName});");
+        }
+
+        private async Task WriteEnumDescriptor(EnumDescriptor @enum, TextWriter writer, string indentation = NoIndent)
+        {
+            await writer.WriteAsync(indentation);
+            await writer.WriteLineAsync($"enum {@enum.Name} {{");
+
+            foreach (var value in @enum.Values)
+            {
+                await writer.WriteAsync(indentation + Indent);
+                await writer.WriteLineAsync($" {value.Name} = {value.Number};");
+            }
+            await writer.WriteLineAsync($"{indentation}}}");
         }
 
         private async Task WriteMessageDescriptor(MessageDescriptor message, TextWriter writer, string indentation = NoIndent)
         {
             await writer.WriteAsync(indentation);
             await writer.WriteLineAsync($"message {message.Name} {{");
+
+            foreach (var @enum in message.EnumTypes)
+            {
+                await WriteEnumDescriptor(@enum, writer, indentation + Indent);
+            }
 
             foreach (var nestedType in message.NestedTypes)
             {
@@ -209,10 +241,10 @@ namespace grpc.client
                 case FieldType.Group:
                     break;
                 case FieldType.Message:
-                    await writer.WriteAsync(field.MessageType.Name);
+                    await writer.WriteAsync(field.MessageType.FullName);
                     break;
                 case FieldType.Enum:
-                    await writer.WriteAsync(field.EnumType.Name);
+                    await writer.WriteAsync(field.EnumType.FullName);
                     break;
             }
 
