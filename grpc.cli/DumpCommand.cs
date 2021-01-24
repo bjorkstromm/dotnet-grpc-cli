@@ -34,7 +34,7 @@ namespace grpc.client
 
             await stream.RequestStream.WriteAsync(new ServerReflectionRequest { FileContainingSymbol = settings.Service });
             await stream.ResponseStream.MoveNext(CancellationToken.None);
-            var descriptors = FileDescriptor.BuildFromByteStrings(stream.ResponseStream.Current.FileDescriptorResponse.FileDescriptorProto);
+            var descriptors = FileDescriptor.BuildFromByteStrings(stream.ResponseStream.Current.FileDescriptorResponse.FileDescriptorProto.Reverse());
             await stream.RequestStream.CompleteAsync();
 
             // Output

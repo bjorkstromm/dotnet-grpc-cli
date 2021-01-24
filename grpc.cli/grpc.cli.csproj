@@ -6,7 +6,7 @@
     <ToolCommandName>dotnet-grpc-cli</ToolCommandName>
     <PackAsTool>True</PackAsTool>
     <OutputType>Exe</OutputType>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <PackageId>dotnet-grpc-cli</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/mholo65/dotnet-grpc-cli/</RepositoryUrl>
