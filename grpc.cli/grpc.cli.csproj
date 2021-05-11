@@ -6,7 +6,7 @@
     <ToolCommandName>dotnet-grpc-cli</ToolCommandName>
     <PackAsTool>True</PackAsTool>
     <OutputType>Exe</OutputType>
-    <Version>0.4.0</Version>
+    <Version>0.5.0</Version>
     <PackageId>dotnet-grpc-cli</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/mholo65/dotnet-grpc-cli/</RepositoryUrl>
@@ -18,9 +18,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Spectre.Cli" Version="0.36.0" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.29.0" />
-    <PackageReference Include="Grpc.Reflection" Version="2.30.0" />
+    <PackageReference Include="Spectre.Console" Version="0.39.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.37.0" />
+    <PackageReference Include="Grpc.Reflection" Version="2.37.1" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Spectre.Cli;
+using Spectre.Console.Cli;
 using Grpc.Reflection.V1Alpha;
 using System.Threading;
 using System;
@@ -18,12 +18,6 @@ namespace grpc.client
                 !address.StartsWith("https://"))
             {
                 address = $"https://{address}";
-            }
-
-            if (address.StartsWith("http://"))
-            {
-                // This switch must be set before creating the GrpcChannel/HttpClient.
-                AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             }
 
             var server = address;

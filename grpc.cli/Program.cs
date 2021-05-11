@@ -1,4 +1,4 @@
-﻿using Spectre.Cli;
+﻿using Spectre.Console.Cli;
 using System.Threading.Tasks;
 
 namespace grpc.client
