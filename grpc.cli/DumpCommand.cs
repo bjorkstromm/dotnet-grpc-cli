@@ -1,7 +1,9 @@
-﻿using Google.Protobuf.Reflection;
+﻿using Google.Protobuf;
+using Google.Protobuf.Reflection;
 using Grpc.Reflection.V1Alpha;
 using Spectre.Console.Cli;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -28,7 +30,8 @@ namespace grpc.client
 
             await stream.RequestStream.WriteAsync(new ServerReflectionRequest { FileContainingSymbol = settings.Service });
             await stream.ResponseStream.MoveNext(CancellationToken.None);
-            var descriptors = FileDescriptor.BuildFromByteStrings(stream.ResponseStream.Current.FileDescriptorResponse.FileDescriptorProto.Reverse());
+
+            var descriptors = FileDescriptor.BuildFromByteStrings(SortFileDescriptors(stream.ResponseStream.Current.FileDescriptorResponse.FileDescriptorProto));
             await stream.RequestStream.CompleteAsync();
 
             // Output
@@ -77,6 +80,18 @@ namespace grpc.client
             }
 
             return 0;
+        }
+
+        private static IEnumerable<ByteString> SortFileDescriptors(IEnumerable<ByteString> descriptorData)
+        {
+            var messageParser = FileDescriptorProto.Parser;
+            var descriptors = descriptorData
+                .Select(descriptor => messageParser.ParseFrom(descriptor))
+                .ToArray();
+            var comparer = new FileDescriptorProtoComparer(descriptors);
+            var ordered = new SortedSet<FileDescriptorProto>(descriptors, comparer);
+
+            return ordered.Select(x => x.ToByteString());
         }
 
         private static bool IsWellKnownType(FileDescriptor descriptor)
@@ -243,6 +258,65 @@ namespace grpc.client
             }
 
             await writer.WriteLineAsync($" {field.Name} = {field.FieldNumber};");
+        }
+
+        private class FileDescriptorProtoComparer : IComparer<FileDescriptorProto>
+        {
+            private IReadOnlyDictionary<string, FileDescriptorProto> _fileDescriptors;
+
+            public FileDescriptorProtoComparer(IEnumerable<FileDescriptorProto> fileDescriptors)
+            {
+                _fileDescriptors = fileDescriptors.ToDictionary(x => x.Name);
+            }
+
+            public int Compare(FileDescriptorProto left, FileDescriptorProto right)
+            {
+                if (left is null)
+                {
+                    return right is null ? 0 : -1;
+                }
+                if (right is null)
+                {
+                    return 1;
+                }
+                if (GetTransitiveDependencies(left).Contains(right.Name))
+                {
+                    return 1;
+                }
+                if (GetTransitiveDependencies(right).Contains(left.Name))
+                {
+                    return -1;
+                }
+
+                return string.Compare(left.Name, right.Name, StringComparison.Ordinal);
+
+                IReadOnlyCollection<string> GetTransitiveDependencies(FileDescriptorProto descriptor)
+                {
+                    if (descriptor is null)
+                    {
+                        return Array.Empty<string>();
+                    }
+
+                    var dependencies = new List<string>();
+
+                    foreach (var dependency in GetDependencies(descriptor))
+                    {
+                        dependencies.Add(dependency.Name);
+                        dependencies.AddRange(GetTransitiveDependencies(dependency));
+                    }
+
+                    return dependencies;
+                }
+            }
+
+            private IReadOnlyCollection<FileDescriptorProto> GetDependencies(FileDescriptorProto fileDescriptor)
+            {
+                return fileDescriptor
+                    .Dependency
+                    .Select(name => _fileDescriptors.TryGetValue(name, out var descriptor) ? descriptor : null)
+                    .Where(descriptor => descriptor is not null)
+                    .ToArray();
+            }
         }
     }
 }
