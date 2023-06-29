@@ -16,5 +16,21 @@ namespace grpc.client
 
         [CommandOption( "-o|--output <OUTPUT>")]
         public string Output { get; set; }
+
+        public override ValidationResult Validate()
+        {
+            var result = string.IsNullOrWhitespace(Address)
+                ? ValidationResult.Error($"{nameof(Address)} cannot be blank.")
+                : ValidationResult.Success();
+
+            if (!result.Successful)
+                return result;
+
+            result = string.IsNullOrWhitespace(Service)
+                ? ValidationResult.Error($"{nameof(Service)} cannot be blank.")
+                : ValidationResult.Success();
+
+            return result;
+        }
     }
 }
